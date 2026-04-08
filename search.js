@@ -1,123 +1,117 @@
-// ─── Elements ────────────────────────────────────────────────────────────────
-const searchInput    = document.getElementById("search-input");
-const searchClose    = document.getElementById("search-close-icon");
-const sortIcon       = document.getElementById("sort-icon");
-const filterWrapper  = document.getElementById("filter-wrapper");
-const typeFilter     = document.getElementById("type-filter");
-const favToggleBtn   = document.getElementById("fav-toggle");
-const themeToggleBtn = document.getElementById("theme-toggle");
-const themeIcon      = document.getElementById("theme-icon");
+var searchBox    = document.getElementById("search-input");
+var clearBtn     = document.getElementById("search-close-icon");
+var filterBtn    = document.getElementById("sort-icon");
+var filterPanel  = document.getElementById("filter-wrapper");
+var typeSelect   = document.getElementById("type-filter");
+var favBtn       = document.getElementById("fav-toggle");
+var themeBtn     = document.getElementById("theme-toggle");
 
-// ─── State ────────────────────────────────────────────────────────────────────
-let showFavoritesOnly = false;
-let typeCache = {};   // id -> types[]
+var showFavOnly  = false;
+var typeCache    = {};
 
-// ─── Theme ───────────────────────────────────────────────────────────────────
-const savedTheme = localStorage.getItem("pokeTheme") || "light";
-applyTheme(savedTheme);
+document.addEventListener("DOMContentLoaded", function() {
+  var theme = document.documentElement.getAttribute("data-theme") || "light";
+  setThemeIcon(theme);
 
-themeToggleBtn.addEventListener("click", () => {
-  const current = document.documentElement.getAttribute("data-theme");
-  applyTheme(current === "dark" ? "light" : "dark");
+  themeBtn.addEventListener("click", function() {
+    var current = document.documentElement.getAttribute("data-theme");
+    var next = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("pokeTheme", next);
+    setThemeIcon(next);
+  });
+
+  searchBox.addEventListener("input", function() {
+    clearBtn.style.display = searchBox.value ? "flex" : "none";
+    applyFilters();
+  });
+
+  clearBtn.addEventListener("click", function() {
+    searchBox.value = "";
+    clearBtn.style.display = "none";
+    applyFilters();
+  });
+
+  filterBtn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    filterPanel.classList.toggle("filter-wrapper-open");
+  });
+
+  document.addEventListener("click", function(e) {
+    if (!filterPanel.contains(e.target) && !filterBtn.contains(e.target)) {
+      filterPanel.classList.remove("filter-wrapper-open");
+    }
+  });
+
+  document.querySelectorAll("input[name='sort']").forEach(function(radio) {
+    radio.addEventListener("change", applyFilters);
+  });
+
+  typeSelect.addEventListener("change", applyFilters);
+
+  favBtn.addEventListener("click", function() {
+    showFavOnly = !showFavOnly;
+    favBtn.classList.toggle("active", showFavOnly);
+    applyFilters();
+  });
 });
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem("pokeTheme", theme);
-  themeIcon.setAttribute("data-icon", theme === "dark" ? "sun" : "moon");
-  // re-inject icon after attribute change
-  if (typeof injectIcons === "function") injectIcons();
+function setThemeIcon(theme) {
+  var iconEl = document.getElementById("theme-icon");
+  if (!iconEl) return;
+  if (theme === "dark") {
+    iconEl.setAttribute("data-icon", "sun");
+    iconEl.innerHTML = icons.sun;
+  } else {
+    iconEl.setAttribute("data-icon", "moon");
+    iconEl.innerHTML = icons.moon;
+  }
 }
 
-// ─── Search ───────────────────────────────────────────────────────────────────
-searchInput.addEventListener("input", () => {
-  searchClose.style.display = searchInput.value ? "flex" : "none";
-  applyFilters();
-});
-
-searchClose.addEventListener("click", () => {
-  searchInput.value = "";
-  searchClose.style.display = "none";
-  applyFilters();
-});
-
-// ─── Sort / Filter panel ──────────────────────────────────────────────────────
-sortIcon.addEventListener("click", (e) => {
-  e.stopPropagation();
-  filterWrapper.classList.toggle("filter-wrapper-open");
-});
-
-document.addEventListener("click", (e) => {
-  if (!filterWrapper.contains(e.target) && !sortIcon.contains(e.target)) {
-    filterWrapper.classList.remove("filter-wrapper-open");
-  }
-});
-
-document.querySelectorAll("input[name='sort']").forEach((radio) => {
-  radio.addEventListener("change", applyFilters);
-});
-
-typeFilter.addEventListener("change", applyFilters);
-
-// ─── Favorites toggle ─────────────────────────────────────────────────────────
-favToggleBtn.addEventListener("click", () => {
-  showFavoritesOnly = !showFavoritesOnly;
-  favToggleBtn.classList.toggle("active", showFavoritesOnly);
-  applyFilters();
-});
-
-// ─── Core filter + sort pipeline (all HOFs) ───────────────────────────────────
 async function applyFilters() {
-  if (typeof allPokemons === "undefined" || allPokemons.length === 0) return;
+  if (!allPokemons || allPokemons.length === 0) return;
 
-  const term      = searchInput.value.toLowerCase().trim();
-  const sortVal   = document.querySelector("input[name='sort']:checked").value;
-  const typeVal   = typeFilter.value;
-  const favIds    = typeof favorites !== "undefined" ? favorites : [];
+  var term     = searchBox.value.toLowerCase().trim();
+  var sortBy   = document.querySelector("input[name='sort']:checked").value;
+  var type     = typeSelect.value;
+  var favIds   = favorites || [];
 
-  // 1. Search filter (HOF: filter)
-  let result = allPokemons.filter((p) => {
-    const id = p.url.split("/")[6];
+  var result = allPokemons.filter(function(p) {
+    var id = p.url.split("/")[6];
     return p.name.toLowerCase().includes(term) || id.includes(term);
   });
 
-  // 2. Favorites filter (HOF: filter)
-  if (showFavoritesOnly) {
-    result = result.filter((p) => favIds.includes(p.url.split("/")[6]));
+  if (showFavOnly) {
+    result = result.filter(function(p) {
+      return favIds.includes(p.url.split("/")[6]);
+    });
   }
 
-  // 3. Type filter — fetch types for visible set only (HOF: filter + map + Promise.all)
-  if (typeVal !== "all") {
-    const withTypes = await Promise.all(
-      result.map(async (p) => {
-        const id = p.url.split("/")[6];
+  if (type !== "all") {
+    var withTypes = await Promise.all(
+      result.map(async function(p) {
+        var id = p.url.split("/")[6];
         if (!typeCache[id]) {
           try {
-            const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-            const data = await res.json();
-            typeCache[id] = data.types.map((t) => t.type.name);
-          } catch {
+            var res  = await fetch("https://pokeapi.co/api/v2/pokemon/" + id);
+            var data = await res.json();
+            typeCache[id] = data.types.map(function(t) { return t.type.name; });
+          } catch (e) {
             typeCache[id] = [];
           }
         }
-        return { p, types: typeCache[id] };
+        return { p: p, types: typeCache[id] };
       })
     );
     result = withTypes
-      .filter(({ types }) => types.includes(typeVal))
-      .map(({ p }) => p);
+      .filter(function(item) { return item.types.includes(type); })
+      .map(function(item) { return item.p; });
   }
 
-  // 4. Sort (HOF: sort)
-  result = [...result].sort((a, b) => {
-    if (sortVal === "name") {
-      return a.name.localeCompare(b.name);
-    } else if (sortVal === "name-desc") {
-      return b.name.localeCompare(a.name);
-    } else {
-      // number (default)
-      return parseInt(a.url.split("/")[6]) - parseInt(b.url.split("/")[6]);
-    }
+  result = result.sort(function(a, b) {
+    if (sortBy === "name")      return a.name.localeCompare(b.name);
+    if (sortBy === "name-desc") return b.name.localeCompare(a.name);
+    return parseInt(a.url.split("/")[6]) - parseInt(b.url.split("/")[6]);
   });
 
   displayPokemons(result);

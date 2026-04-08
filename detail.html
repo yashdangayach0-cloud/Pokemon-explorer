@@ -7,7 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
-    <script src="./assets/icons.js" defer></script>
+    <script>
+      const savedTheme = localStorage.getItem("pokeTheme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    </script>
+    <script src="./icons.js" defer></script>
     <script src="./pokemon-detail.js" defer></script>
   </head>
   <body>
@@ -70,10 +74,5 @@
       </div>
       <span data-icon="pokedex" class="detail-bg icon-wrap"></span>
     </main>
-    <script>
-      // Apply saved theme before paint to avoid flash
-      const t = localStorage.getItem("pokeTheme") || "light";
-      document.documentElement.setAttribute("data-theme", t);
-    </script>
   </body>
 </html>

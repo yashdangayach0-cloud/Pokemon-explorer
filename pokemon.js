@@ -1,131 +1,99 @@
-// ─── Constants ───────────────────────────────────────────────────────────────
-const MAX_POKEMON = 898;
-const listWrapper = document.getElementById("list-wrapper");
-const loadingEl = document.getElementById("loading");
-const pokemonListEl = document.getElementById("pokemon-list");
-const notFoundMessage = document.getElementById("not-found-message");
+var MAX_POKEMON = 898;
+var API_URL = "https://pokeapi.co/api/v2/pokemon?limit=" + MAX_POKEMON;
+var IMG_URL = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
+var FALLBACK_URL = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 
-// ─── State ────────────────────────────────────────────────────────────────────
-let allPokemons = [];          // raw list from API  { name, url }
-let pokemonTypeCache = {};     // id -> [type, ...]  (fetched on demand)
-let favorites = loadFavorites();
+var grid = document.getElementById("list-wrapper");
+var loader = document.getElementById("loading");
+var listSection = document.getElementById("pokemon-list");
+var noResult = document.getElementById("not-found-message");
 
-// ─── Bootstrap ───────────────────────────────────────────────────────────────
-fetchAllPokemons();
+var allPokemons = [];
+var favorites = getFavorites();
 
-async function fetchAllPokemons() {
+loadPokemons();
+
+async function loadPokemons() {
   try {
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${MAX_POKEMON}`);
-    const data = await res.json();
+    var res = await fetch(API_URL);
+    var data = await res.json();
     allPokemons = data.results;
-    showList();
+    loader.style.display = "none";
+    listSection.style.display = "block";
     displayPokemons(allPokemons);
   } catch (err) {
-    showError("Failed to load Pokémon. Please check your connection.");
+    loader.innerHTML = "<p class='error-msg'>Failed to load. Check your connection.</p>";
   }
 }
 
-function showList() {
-  loadingEl.style.display = "none";
-  pokemonListEl.style.display = "block";
-}
-
-function showError(msg) {
-  loadingEl.innerHTML = `<p class="error-msg">${msg}</p>`;
-}
-
-// ─── Rendering ───────────────────────────────────────────────────────────────
 function displayPokemons(list) {
-  listWrapper.innerHTML = "";
-  notFoundMessage.style.display = list.length === 0 ? "block" : "none";
+  grid.innerHTML = "";
+  noResult.style.display = list.length === 0 ? "block" : "none";
 
-  list.forEach((pokemon) => {
-    const id = getPokemonId(pokemon);
-    const card = buildCard(pokemon, id);
-    listWrapper.appendChild(card);
+  list.forEach(function(pokemon) {
+    var id = getId(pokemon.url);
+    var card = makeCard(pokemon, id);
+    grid.appendChild(card);
   });
 }
 
-function buildCard(pokemon, id) {
-  const isFav = favorites.includes(id);
-  const imgSrc = officialArtUrl(id);
-  const fallback = spriteUrl(id);
-
-  const card = document.createElement("div");
+function makeCard(pokemon, id) {
+  var card = document.createElement("div");
   card.className = "list-item";
   card.dataset.id = id;
-  card.innerHTML = `
-    <div class="number-wrap">
-      <p class="caption-fonts">#${id}</p>
-      <button class="fav-btn ${isFav ? "active" : ""}" data-id="${id}" aria-label="Favorite">
-        <svg viewBox="0 0 24 24" width="14" height="14">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                   2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-                   C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
-                   c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-      </button>
-    </div>
-    <div class="img-wrap">
-      <img src="${imgSrc}" alt="${pokemon.name}"
-           onerror="this.onerror=null;this.src='${fallback}'" loading="lazy" />
-    </div>
-    <div class="name-wrap">
-      <p class="body3-fonts">${pokemon.name}</p>
-    </div>
-  `;
 
-  card.addEventListener("click", (e) => {
+  var isFav = favorites.includes(id);
+
+  card.innerHTML =
+    '<div class="number-wrap">' +
+      '<p class="caption-fonts">#' + id + '</p>' +
+      '<button class="fav-btn ' + (isFav ? "active" : "") + '" aria-label="Favorite">' +
+        '<svg viewBox="0 0 24 24" width="14" height="14">' +
+          '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>' +
+        '</svg>' +
+      '</button>' +
+    '</div>' +
+    '<div class="img-wrap">' +
+      '<img src="' + IMG_URL + id + '.png" alt="' + pokemon.name + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + FALLBACK_URL + id + '.png\'">' +
+    '</div>' +
+    '<div class="name-wrap">' +
+      '<p class="body3-fonts">' + pokemon.name + '</p>' +
+    '</div>';
+
+  card.addEventListener("click", function(e) {
     if (e.target.closest(".fav-btn")) return;
-    navigateToDetail(id);
+    window.location.href = "./detail.html?id=" + id;
   });
 
-  card.querySelector(".fav-btn").addEventListener("click", (e) => {
+  card.querySelector(".fav-btn").addEventListener("click", function(e) {
     e.stopPropagation();
-    toggleFavorite(id, card.querySelector(".fav-btn"));
+    toggleFav(id, card.querySelector(".fav-btn"));
   });
 
   return card;
 }
 
-async function navigateToDetail(id) {
-  try {
-    await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-    window.location.href = `./detail.html?id=${id}`;
-  } catch {
-    window.location.href = `./detail.html?id=${id}`;
-  }
-}
-
-// ─── Favorites ────────────────────────────────────────────────────────────────
-function loadFavorites() {
-  return JSON.parse(localStorage.getItem("pokeFavorites") || "[]");
+function getFavorites() {
+  var saved = localStorage.getItem("pokeFavorites");
+  return saved ? JSON.parse(saved) : [];
 }
 
 function saveFavorites() {
   localStorage.setItem("pokeFavorites", JSON.stringify(favorites));
 }
 
-function toggleFavorite(id, btn) {
+function toggleFav(id, btn) {
   if (favorites.includes(id)) {
-    favorites = favorites.filter((f) => f !== id);
+    favorites = favorites.filter(function(f) { return f !== id; });
     btn.classList.remove("active");
   } else {
-    favorites = [...favorites, id];
+    favorites.push(id);
     btn.classList.add("active");
   }
   saveFavorites();
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function getPokemonId(pokemon) {
-  return pokemon.url.split("/")[6];
-}
-
-function officialArtUrl(id) {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
-}
-
-function spriteUrl(id) {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+function getId(url) {
+  var parts = url.split("/");
+  return parts[6];
 }

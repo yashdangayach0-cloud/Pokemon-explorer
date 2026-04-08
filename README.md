@@ -1,81 +1,38 @@
-## Pokémon Explorer
+## Pokemon Explorer
 
+Pokemon Explorer is a small front-end app for browsing Pokemon data from [PokeAPI](https://pokeapi.co/). It shows a responsive list of Pokemon cards, supports search and sorting, lets you filter by type, and saves favorites and theme preferences in local storage.
 
-# Project Overview
+### What the app does
 
-Pokémon Explorer is a web application that allows users to explore Pokémon information in an interactive and visually appealing interface.
-The application fetches Pokémon data from a public API and displays it dynamically on the webpage.
+- Loads the first 898 Pokemon from PokeAPI
+- Shows each Pokemon in a card-based grid
+- Supports search by name or number
+- Lets users sort by number, name A-Z, or name Z-A
+- Filters Pokemon by type
+- Saves favorite Pokemon in the browser
+- Supports light and dark themes
+- Includes a detail page with stats, abilities, and flavor text
 
-Users will be able to search, filter, and sort Pokémon based on different attributes, making it easier to explore and discover various Pokémon.
+### Tech stack
 
-The project demonstrates the use of JavaScript concepts such as API integration, array higher-order functions, and dynamic UI rendering.
+- HTML
+- CSS
+- JavaScript
+- Fetch API
+- Local Storage
 
-# API Used
+### API endpoints
 
-This project uses the Pokemon 3D API to retrieve Pokémon data.
+- Pokemon list: `https://pokeapi.co/api/v2/pokemon?limit=898`
+- Pokemon detail: `https://pokeapi.co/api/v2/pokemon/:id`
+- Pokemon species: `https://pokeapi.co/api/v2/pokemon-species/:id`
 
-API Endpoint:
-https://pokemon-3d-api.onrender.com/v1/pokemon
+### Project files
 
-The API provides information such as:
-
-Pokémon name
-Pokémon ID
-Pokémon type
-Pokémon images
-# Planned Features
-# Search
-
-Users will be able to search Pokémon by name using a search bar.
-The search functionality will dynamically filter Pokémon results as the user types.
-
-# Filtering
-
-Users will be able to filter Pokémon based on their type (for example: Fire, Water, Grass, Electric).
-
-# Sorting
-
-Users will be able to sort Pokémon based on attributes such as:
-
-Name (Alphabetical order)
-Pokémon ID
-# Favorite Pokémon
-
-Users can mark Pokémon as favorites and store them locally using browser storage.
-
-# Dark Mode
-
-A toggle feature will allow users to switch between light mode and dark mode for better user experience.
-
-🛠 Technologies Used
-HTML
-CSS
-JavaScript
-Fetch API
-Array Higher Order Functions:
-map()
-filter()
-sort()
-
-Optional libraries that may be used:
-
-
-The application interface will include:
-
-Navigation Bar
-Project title
-Search bar
-Theme toggle (Dark/Light mode)
-Filter and Sort Section
-Dropdown to filter Pokémon by type
-Dropdown to sort Pokémon
-Pokémon Display Section
-
-Pokémon will be displayed in a responsive grid layout using cards.
-
-Each card will show:
-
-Pokémon image
-Pokémon name
-Pokémon type
-Favorite button
+- `index.html`: Home page
+- `detail.html`: Pokemon detail page
+- `style.css`: Shared styles
+- `pokemon.js`: Loads and renders the main Pokemon list
+- `search.js`: Search, sorting, type filters, favorites view, and theme toggle
+- `pokemon-detail.js`: Detail page rendering and navigation
+- `icons.js`: SVG icon injection

@@ -7,7 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
-    <script src="./assets/icons.js" defer></script>
+    <script>
+      const savedTheme = localStorage.getItem("pokeTheme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    </script>
+    <script src="./icons.js" defer></script>
     <script src="./pokemon.js" defer></script>
     <script src="./search.js" defer></script>
   </head>
@@ -20,14 +24,9 @@
             <h1>Pokédex</h1>
           </div>
           <div class="header-controls">
-
-            <!-- Dark mode -->
             <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
               <span data-icon="moon" class="icon-wrap" id="theme-icon"></span>
             </button>
-
-            <!-- Favorites -->
-             
             <button class="fav-toggle" id="fav-toggle" aria-label="Show favorites">
               <span data-icon="heart" class="icon-wrap"></span>
               <span class="fav-label">Favorites</span>
@@ -93,7 +92,6 @@
         </div>
       </header>
 
-      <!-- Loading spinner -->
       <div id="loading" class="loading-wrapper">
         <div class="pokeball-spinner"></div>
         <p class="body2-fonts">Loading Pokémon...</p>
