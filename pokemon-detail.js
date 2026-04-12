@@ -1,10 +1,10 @@
-var MAX_ID = 898;
-var IMG_URL = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
-var FALLBACK_URL = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
+const MAX_ID = 898;
+const IMG = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
+const FALLBACK = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 
-var currentId = null;
+let currentId = null;
 
-var typeColors = {
+const typeColors = {
   normal:   "#A8A878",
   fire:     "#F08030",
   water:    "#6890F0",
@@ -25,18 +25,18 @@ var typeColors = {
   fairy:    "#EE99AC"
 };
 
-var statNames = {
-  "hp":               "HP",
-  "attack":           "ATK",
-  "defense":          "DEF",
-  "special-attack":   "SATK",
-  "special-defense":  "SDEF",
-  "speed":            "SPD"
+const statNames = {
+  "hp":              "HP",
+  "attack":          "ATK",
+  "defense":         "DEF",
+  "special-attack":  "SATK",
+  "special-defense": "SDEF",
+  "speed":           "SPD"
 };
 
 document.addEventListener("DOMContentLoaded", function() {
-  var params = new URLSearchParams(window.location.search);
-  var id = parseInt(params.get("id"));
+  let params = new URLSearchParams(window.location.search);
+  let id = parseInt(params.get("id"));
 
   if (!id || id < 1 || id > MAX_ID) {
     window.location.href = "./index.html";
@@ -49,12 +49,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 async function loadPokemon(id) {
   try {
-    var res     = await fetch("https://pokeapi.co/api/v2/pokemon/" + id);
-    var pokemon = await res.json();
+    let res = await fetch("https://pokeapi.co/api/v2/pokemon/" + id);
+    let dataa = await res.json();
 
-    var speciesData = null;
+    let speciesData = null;
     try {
-      var sRes    = await fetch("https://pokeapi.co/api/v2/pokemon-species/" + id);
+      let sRes = await fetch("https://pokeapi.co/api/v2/pokemon-species/" + id);
       speciesData = await sRes.json();
     } catch (e) {
       speciesData = null;
@@ -62,69 +62,70 @@ async function loadPokemon(id) {
 
     if (currentId !== id) return;
 
-    showPokemon(pokemon, speciesData);
+    showPokemon(dataa, speciesData);
     setupArrows(id);
     window.history.pushState({}, "", "./detail.html?id=" + id);
 
   } catch (err) {
-    console.error("Failed to load pokemon:", err);
+    console.error("Failed to load:", err);
   }
 }
 
-function showPokemon(pokemon, species) {
-  var name = capitalize(pokemon.name);
+function showPokemon(dataa, species) {
+  let name = dataa.name.charAt(0).toUpperCase() + dataa.name.slice(1);
 
   document.title = name;
   document.querySelector(".name-wrap .name").textContent = name;
-  document.querySelector(".pokemon-id-wrap .body2-fonts").textContent = "#" + pad(pokemon.id);
+  document.querySelector(".detail-header .pokemon-id-wrap .body2-fonts").textContent = "#" + String(dataa.id).padStart(3, "0");
 
-  var img = document.querySelector(".detail-img-wrapper img");
-  img.src = IMG_URL + pokemon.id + ".png";
-  img.alt = pokemon.name;
+  let img = document.querySelector(".detail-img-wrapper img");
+  img.src = IMG + dataa.id + ".png";
+  img.alt = dataa.name;
   img.onerror = function() {
     img.onerror = null;
-    img.src = FALLBACK_URL + pokemon.id + ".png";
+    img.src = FALLBACK + dataa.id + ".png";
   };
 
-  var typeBox = document.querySelector(".power-wrapper");
+  let typeBox = document.querySelector(".power-wrapper");
   typeBox.innerHTML = "";
-  pokemon.types.forEach(function(t) {
-    var p = document.createElement("p");
+  for (let t of dataa.types) {
+    let p = document.createElement("p");
     p.className = "body3-fonts type " + t.type.name;
     p.textContent = t.type.name;
     typeBox.appendChild(p);
-  });
+  }
 
-  document.querySelector(".weight").textContent = (pokemon.weight / 10) + " kg";
-  document.querySelector(".height").textContent = (pokemon.height / 10) + " m";
+  document.querySelector(".weight").textContent = (dataa.weight / 10) + " kg";
+  document.querySelector(".height").textContent = (dataa.height / 10) + " m";
 
-  var moveBox = document.querySelector(".pokemon-detail.move");
+  let moveBox = document.querySelector(".pokemon-detail.move");
   moveBox.innerHTML = "";
-  pokemon.abilities.forEach(function(a) {
-    var p = document.createElement("p");
+  for (let a of dataa.abilities) {
+    let p = document.createElement("p");
     p.className = "body3-fonts";
     p.textContent = a.ability.name;
     moveBox.appendChild(p);
-  });
+  }
 
-  var desc = species ? getDescription(species) : "";
+  let desc = species ? getDesc(species) : "";
   document.querySelector(".pokemon-description").textContent = desc;
 
-  var statsBox = document.querySelector(".stats-wrapper");
+  let statsBox = document.querySelector(".stats-wrapper");
   statsBox.innerHTML = "";
-  pokemon.stats.forEach(function(s) {
-    var row = document.createElement("div");
+
+  for (let s of dataa.stats) {
+    let row = document.createElement("div");
     row.className = "stats-wrap";
 
-    var label = document.createElement("p");
+    let label = document.createElement("p");
     label.className = "body3-fonts stats";
     label.textContent = statNames[s.stat.name] || s.stat.name;
 
-    var val = document.createElement("p");
+    let val = document.createElement("p");
     val.className = "body3-fonts";
-    val.textContent = pad(s.base_stat);
+    val.textContent = String(s.base_stat).padStart(3, "0");
 
-    var bar = document.createElement("progress");
+    let bar = document.createElement("progress");
     bar.className = "progress-bar";
     bar.value = s.base_stat;
     bar.max = 100;
@@ -133,17 +134,17 @@ function showPokemon(pokemon, species) {
     row.appendChild(val);
     row.appendChild(bar);
     statsBox.appendChild(row);
-  });
+  }
 
-  applyColor(pokemon);
+  applyColor(dataa);
 }
 
 function setupArrows(id) {
-  var left  = document.getElementById("leftArrow");
-  var right = document.getElementById("rightArrow");
+  let left = document.getElementById("leftArrow");
+  let right = document.getElementById("rightArrow");
 
-  var newLeft  = left.cloneNode(true);
-  var newRight = right.cloneNode(true);
+  let newLeft = left.cloneNode(true);
+  let newRight = right.cloneNode(true);
   left.parentNode.replaceChild(newLeft, left);
   right.parentNode.replaceChild(newRight, right);
 
@@ -170,9 +171,9 @@ function setupArrows(id) {
   }
 }
 
-function applyColor(pokemon) {
-  var type  = pokemon.types[0].type.name;
-  var color = typeColors[type];
+function applyColor(dataa) {
+  let type = dataa.types[0].type.name;
+  let color = typeColors[type];
   if (!color) return;
 
   document.querySelector(".detail-main").style.backgroundColor = color;
@@ -189,31 +190,23 @@ function applyColor(pokemon) {
     el.style.color = color;
   });
 
-  var r = parseInt(color.slice(1, 3), 16);
-  var g = parseInt(color.slice(3, 5), 16);
-  var b = parseInt(color.slice(5, 7), 16);
+  let r = parseInt(color.slice(1, 3), 16);
+  let g = parseInt(color.slice(3, 5), 16);
+  let b = parseInt(color.slice(5, 7), 16);
 
-  var style = document.createElement("style");
+  let style = document.createElement("style");
   style.innerHTML =
     ".stats-wrap .progress-bar::-webkit-progress-bar { background-color: rgba(" + r + "," + g + "," + b + ",0.5); }" +
     ".stats-wrap .progress-bar::-webkit-progress-value { background-color: " + color + "; }";
   document.head.appendChild(style);
 }
 
-function getDescription(species) {
-  var entries = species.flavor_text_entries;
-  for (var i = 0; i < entries.length; i++) {
+function getDesc(species) {
+  let entries = species.flavor_text_entries;
+  for (let i = 0; i < entries.length; i++) {
     if (entries[i].language.name === "en") {
       return entries[i].flavor_text.replace(/\f/g, " ");
     }
   }
   return "";
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function pad(num) {
-  return String(num).padStart(3, "0");
 }

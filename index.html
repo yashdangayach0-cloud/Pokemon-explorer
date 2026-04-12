@@ -1,108 +1,104 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pokédex</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-    <script>
-      const savedTheme = localStorage.getItem("pokeTheme") || "light";
-      document.documentElement.setAttribute("data-theme", savedTheme);
-    </script>
-    <script src="./icons.js" defer></script>
-    <script src="./pokemon.js" defer></script>
-    <script src="./search.js" defer></script>
-  </head>
-  <body>
-    <main class="main">
-      <header class="header home">
-        <div class="container">
-          <div class="logo-wrapper">
-            <span data-icon="pokeball" class="icon-wrap logo-icon"></span>
-            <h1>Pokédex</h1>
-          </div>
-          <div class="header-controls">
-            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
-              <span data-icon="moon" class="icon-wrap" id="theme-icon"></span>
-            </button>
-            <button class="fav-toggle" id="fav-toggle" aria-label="Show favorites">
-              <span data-icon="heart" class="icon-wrap"></span>
-              <span class="fav-label">Favorites</span>
-            </button>
-          </div>
-        </div>
-        <div class="container search-container">
-          <div class="search-wrap">
-            <span data-icon="search" class="search-icon icon-wrap"></span>
-            <input
-              type="text"
-              class="search-input body3-fonts"
-              placeholder="Search by name or number..."
-              id="search-input"
-            />
-            <span data-icon="cross" class="search-close-icon icon-wrap" id="search-close-icon"></span>
-          </div>
-          <div class="sort-wrapper">
-            <div class="sort-wrap" id="sort-icon" aria-label="Sort and filter">
-              <span data-icon="sorting" class="icon-wrap"></span>
-            </div>
-            <div class="filter-wrapper" id="filter-wrapper">
-              <p class="body2-fonts filter-title">Sort & Filter</p>
-              <div class="filter-wrap">
-                <p class="filter-section-label">Sort by:</p>
-                <div class="filter-row">
-                  <input type="radio" id="number" name="sort" value="number" checked />
-                  <label for="number" class="body3-fonts">Number</label>
-                </div>
-                <div class="filter-row">
-                  <input type="radio" id="name" name="sort" value="name" />
-                  <label for="name" class="body3-fonts">Name A–Z</label>
-                </div>
-                <div class="filter-row">
-                  <input type="radio" id="name-desc" name="sort" value="name-desc" />
-                  <label for="name-desc" class="body3-fonts">Name Z–A</label>
-                </div>
-                <p class="filter-section-label">Filter by type:</p>
-                <select id="type-filter" class="type-select body3-fonts">
-                  <option value="all">All Types</option>
-                  <option value="normal">Normal</option>
-                  <option value="fire">Fire</option>
-                  <option value="water">Water</option>
-                  <option value="electric">Electric</option>
-                  <option value="grass">Grass</option>
-                  <option value="ice">Ice</option>
-                  <option value="fighting">Fighting</option>
-                  <option value="poison">Poison</option>
-                  <option value="ground">Ground</option>
-                  <option value="flying">Flying</option>
-                  <option value="psychic">Psychic</option>
-                  <option value="bug">Bug</option>
-                  <option value="rock">Rock</option>
-                  <option value="ghost">Ghost</option>
-                  <option value="dragon">Dragon</option>
-                  <option value="dark">Dark</option>
-                  <option value="steel">Steel</option>
-                  <option value="fairy">Fairy</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore the ultimate premium Pokédex built with Vanilla HTML, CSS, and JS. Discover your favorite Pokémon today!">
+  <title>Pokédex Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    const saved = localStorage.getItem("pokeTheme") || "light";
+    document.documentElement.setAttribute("data-theme", saved);
+  </script>
+</head>
+<body>
 
-      <div id="loading" class="loading-wrapper">
-        <div class="pokeball-spinner"></div>
-        <p class="body2-fonts">Loading Pokémon...</p>
+  <header>
+    <div class="top-row">
+      <div class="logo-wrapper">
+        <div class="pokeball-logo"></div>
+        <h1>Pokédex</h1>
       </div>
+      <div class="header-buttons">
+        <button class="theme-btn" id="theme-toggle">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <button class="fav-btn-header" id="fav-toggle">
+          ♥ <span class="fav-label">Favorites</span>
+        </button>
+      </div>
+    </div>
 
-      <section class="pokemon-list" id="pokemon-list" style="display:none">
-        <div class="container">
-          <div class="list-wrapper" id="list-wrapper"></div>
+    <div class="search-row" style="position: relative;">
+      <div class="search-wrap">
+        <span>🔍</span>
+        <input type="text" placeholder="Search by name or number..." id="search-input">
+        <button class="clear-btn" id="search-clear-icon">✕</button>
+      </div>
+      <div class="sort-wrap" id="sort-icon">⇅</div>
+      <div class="filter-panel" id="filter-wrapper">
+        <p>Sort & Filter</p>
+        <div class="radio-row">
+          <input type="radio" id="number" name="sort" value="number" checked>
+          <label for="number">Number Ascending</label>
         </div>
-        <p id="not-found-message" class="not-found">No Pokémon found</p>
-      </section>
-    </main>
-  </body>
+        <div class="radio-row">
+          <input type="radio" id="name" name="sort" value="name">
+          <label for="name">Name A–Z</label>
+        </div>
+        <div class="radio-row">
+          <input type="radio" id="name-desc" name="sort" value="name-desc">
+          <label for="name-desc">Name Z–A</label>
+        </div>
+        <p style="margin-top: 10px;">Filter by type:</p>
+        <select id="type-filter" class="type-select">
+          <option value="all">All Types</option>
+          <option value="normal">Normal</option>
+          <option value="fire">Fire</option>
+          <option value="water">Water</option>
+          <option value="electric">Electric</option>
+          <option value="grass">Grass</option>
+          <option value="ice">Ice</option>
+          <option value="fighting">Fighting</option>
+          <option value="poison">Poison</option>
+          <option value="ground">Ground</option>
+          <option value="flying">Flying</option>
+          <option value="psychic">Psychic</option>
+          <option value="bug">Bug</option>
+          <option value="rock">Rock</option>
+          <option value="ghost">Ghost</option>
+          <option value="dragon">Dragon</option>
+          <option value="dark">Dark</option>
+          <option value="steel">Steel</option>
+          <option value="fairy">Fairy</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="loading" class="loading-wrapper">
+      <div class="pokeball-spinner"></div>
+      <p>Loading Pokémon...</p>
+    </div>
+
+    <div id="featured-section" class="featured-wrapper" style="display: none;">
+      <div class="featured-container">
+        <div class="featured-img-wrap">
+          <img id="featured-img" src="" alt="">
+        </div>
+        <h2 id="featured-name" class="featured-name"></h2>
+      </div>
+    </div>
+
+    <div class="pokemon-list" id="pokemon-list" style="display: none;">
+      <div class="list-wrapper" id="list-wrapper"></div>
+      <p id="not-found-message" class="not-found" style="display: none;">No Pokémon found</p>
+    </div>
+  </main>
+
+  <script src="pokemon.js"></script>
+  <script src="search.js"></script>
+</body>
 </html>

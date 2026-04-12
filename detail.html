@@ -1,78 +1,77 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pokémon Detail</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-    <script>
-      const savedTheme = localStorage.getItem("pokeTheme") || "light";
-      document.documentElement.setAttribute("data-theme", savedTheme);
-    </script>
-    <script src="./icons.js" defer></script>
-    <script src="./pokemon-detail.js" defer></script>
-  </head>
-  <body>
-    <main class="detail-main main">
-      <header class="header">
-        <div class="header-wrapper">
-          <div class="header-wrap">
-            <a href="./index.html" class="back-btn-wrap">
-              <span data-icon="back-to-home" class="back-btn icon-wrap" id="back-btn"></span>
-            </a>
-            <div class="name-wrap">
-              <h1 class="name"></h1>
-            </div>
-          </div>
-          <div class="pokemon-id-wrap">
-            <p class="body2-fonts"></p>
-          </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View the detailed stats, abilities, and characteristics of this amazing Pokémon in our premium Explorer app.">
+  <title>Pokémon Detail Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    const saved = localStorage.getItem("pokeTheme") || "light";
+    document.documentElement.setAttribute("data-theme", saved);
+  </script>
+</head>
+<body>
+
+  <main class="detail-main" id="detail-main">
+
+    <div class="detail-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <a href="./index.html" class="back-btn">&#8592;</a>
+        <div class="name-wrap">
+          <h1 class="name"></h1>
         </div>
-      </header>
-      <div class="featured-img">
-        <a href="#" class="arrow left-arrow" id="leftArrow">
-          <span data-icon="chevron-left" class="icon-wrap"></span>
-        </a>
-        <div class="detail-img-wrapper">
-          <img src="" alt="" />
-        </div>
-        <a href="#" class="arrow right-arrow" id="rightArrow">
-          <span data-icon="chevron-right" class="icon-wrap"></span>
-        </a>
       </div>
-      <div class="detail-card-detail-wrapper">
-        <div class="power-wrapper">
-          <p class="body3-fonts type grass"></p>
-          <p class="body3-fonts type poison"></p>
-        </div>
-        <p class="body2-fonts about-text">About</p>
-        <div class="pokemon-detail-wrapper">
-          <div class="pokemon-detail-wrap">
-            <div class="pokemon-detail">
-              <span data-icon="weight" class="icon-wrap"></span>
-              <p class="body3-fonts weight"></p>
-            </div>
-            <p class="caption-fonts">Weight</p>
-          </div>
-          <div class="pokemon-detail-wrap">
-            <div class="pokemon-detail">
-              <span data-icon="height" class="icon-wrap straighten"></span>
-              <p class="body3-fonts height"></p>
-            </div>
-            <p class="caption-fonts">Height</p>
-          </div>
-          <div class="pokemon-detail-wrap">
-            <div class="pokemon-detail move"></div>
-            <p class="caption-fonts">Move</p>
-          </div>
-        </div>
-        <p class="body3-fonts pokemon-description"></p>
-        <p class="body2-fonts about-text">Base Stats</p>
-        <div class="stats-wrapper"></div>
+      <div class="pokemon-id-wrap">
+        <p class="body2-fonts"></p>
       </div>
-      <span data-icon="pokedex" class="detail-bg icon-wrap"></span>
-    </main>
-  </body>
+    </div>
+
+    <div class="featured-img">
+      <a href="#" class="arrow left-arrow" id="leftArrow">&#8249;</a>
+      <div class="detail-img-wrapper">
+        <img src="" alt="">
+      </div>
+      <a href="#" class="arrow right-arrow" id="rightArrow">&#8250;</a>
+    </div>
+
+    <div class="detail-card">
+      <div class="power-wrapper"></div>
+
+      <p class="about-text">About</p>
+
+      <div class="pokemon-detail-wrapper">
+        <div class="pokemon-detail-wrap">
+          <div class="pokemon-detail">
+            <span>⚖</span>
+            <p class="weight"></p>
+          </div>
+          <p class="caption-fonts">Weight</p>
+        </div>
+        <div class="pokemon-detail-wrap">
+          <div class="pokemon-detail">
+            <span>↕</span>
+            <p class="height"></p>
+          </div>
+          <p class="caption-fonts">Height</p>
+        </div>
+        <div class="pokemon-detail-wrap">
+          <div class="pokemon-detail move"></div>
+          <p class="caption-fonts">Move</p>
+        </div>
+      </div>
+
+      <p class="pokemon-description"></p>
+
+      <p class="about-text">Base Stats</p>
+      <div class="stats-wrapper"></div>
+    </div>
+
+    <div class="detail-bg">◎</div>
+
+  </main>
+
+  <script src="pokemon-detail.js"></script>
+</body>
 </html>
