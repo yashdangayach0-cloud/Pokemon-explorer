@@ -44,7 +44,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Header */
+
 header {
   position: sticky;
   top: 0;
@@ -130,7 +130,7 @@ header {
   border-color: var(--accent);
 }
 
-/* Search Row */
+
 .search-row {
   display: flex;
   gap: 12px;
@@ -194,7 +194,7 @@ header {
   transform: rotate(15deg);
 }
 
-/* Filter Panel */
+
 .filter-panel {
   display: none;
   position: absolute;
@@ -230,7 +230,7 @@ header {
   cursor: pointer;
 }
 
-/* Loading */
+
 .loading-wrapper {
   display: flex;
   flex-direction: column;
@@ -250,7 +250,7 @@ header {
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* Featured */
+
 .featured-wrapper {
   padding: 20px 20px 60px;
   text-align: center;
@@ -294,7 +294,7 @@ header {
 }
 [data-theme="dark"] .featured-name { color: rgba(255,255,255,0.2); }
 
-/* List */
+
 .pokemon-list {
   padding: 40px 5%;
   background-color: var(--bg-primary);
@@ -383,7 +383,7 @@ header {
   text-transform: capitalize;
 }
 
-/* Detail Page */
+
 .detail-main {
   min-height: 100vh;
   transition: background-color 0.5s ease;
@@ -514,7 +514,7 @@ header {
 .stats-wrap .progress-bar::-webkit-progress-bar { background-color: var(--bg-primary); border-radius: 10px; }
 .stats-wrap .progress-bar::-webkit-progress-value { border-radius: 10px; transition: width 1s ease-in-out; }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .logo-wrapper h1 { font-size: 20px; }
   .fav-btn-header .fav-label { display: none; }
